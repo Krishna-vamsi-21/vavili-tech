@@ -1,0 +1,85 @@
+#The CIFAR-10 dataset, used in this program, is readily available in Keras. 
+#The dataset comprises ten distinct classes, including airplane, automobile, 
+#bird, cat, deer, dog, frog, horse, ship, and truck.
+
+from tensorflow import keras
+import matplotlib.pyplot as plt
+from sklearn.metrics import accuracy_score,confusion_matrix,classification_report
+import numpy as np
+import cv2
+
+#we load dataset by using the below code.
+
+(x_train, y_train), (x_test, y_test) = keras.datasets.cifar10.load_data()
+	
+	Downloading data from https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz
+	170498071/170498071 [==============================] - 3s 0us/step
+
+#we can know the size of Test and Train using below code.
+
+x_train.shape,x_test.shape
+
+	((50000, 32, 32, 3), (10000, 32, 32, 3))
+
+#Here we can see that we have 50000  images for train and 10000 images for test
+
+#Now we  have to normalize the data.
+
+x_train = x_train/255.0
+x_test = x_test/255.0
+
+#Now we have to reshape the data to 2D, Because we are using sklearn.
+
+nsamples, nx, ny, nrgb = x_train.shape
+x_train2 = x_train.reshape((nsamples,nx*ny*nrgb))
+
+nsamples, nx, ny, nrgb = x_test.shape
+x_test2 = x_test.reshape((nsamples,nx*ny*nrgb))
+
+#Implementing the KNN classifier, We have choosen 7 neighbours randomly
+
+from sklearn.neighbors import KNeighborsClassifier
+knn=KNeighborsClassifier(n_neighbors=7)
+
+#Fitting the data
+
+knn.fit(x_train2,y_train)
+
+	/usr/local/lib/python3.10/dist-packages/sklearn/neighbors/_classification.py:215: 	DataConversionWarning: A column-vector y was passed when a 1d array was expected. 	Please change the shape of y to (n_samples,), for example using ravel().
+  	return self._fit(X, y)
+
+		KNeighborsClassifier
+	KNeighborsClassifier(n_neighbors=7)
+
+#KNN model predict for Test set
+
+y_pred_knn=knn.predict(x_test2)
+y_pred_knn
+
+	array([2, 8, 8, ..., 5, 6, 4], dtype=uint8)
+
+#Confusion matrix
+
+confusion_matrix(y_pred_knn,y_test)
+
+	array([[518, 118, 110,  66,  60,  63,  22,  78, 112, 152],
+       [  7, 195,   2,   5,   0,   2,   1,   8,  10,  50],
+       [118, 124, 437, 243, 268, 225, 271, 185,  47,  95],
+       [ 12,  51,  50, 199,  33, 156,  56,  57,  34,  59],
+       [ 46, 173, 250, 214, 521, 201, 319, 294,  69, 135],
+       [  5,  32,  24, 102,  14, 204,  32,  60,  12,  19],
+       [ 30,  55,  65, 108,  44,  80, 265,  48,  14,  52],
+       [  5,   8,   7,  11,  11,  10,   1, 196,   7,  25],
+       [255, 223,  53,  51,  48,  53,  32,  68, 688, 278],
+       [  4,  21,   2,   1,   1,   6,   1,   6,   7, 135]])
+
+#Accuracy Score
+
+accuracy_score(y_pred_knn,y_test)
+
+	0.3358
+
+# Here we get the accuracy only 34% so it is not a good model to image classification.
+	
+
+	
